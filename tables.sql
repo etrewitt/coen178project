@@ -6,12 +6,12 @@ Drop table CourseList;
 set serveroutput on;
 
 Create table CourseList (
-  dept        varchar(4),
-  courseNo    varchar(3),
-  name        varchar(127),
-  units       number,
-  prereq_dept      varchar(4),
-  prereq_courseNo   varchar(3),
+  dept            varchar(4),
+  courseNo        varchar(3),
+  name            varchar(127),
+  units           number,
+  prereq_dept     varchar(4),
+  prereq_courseNo varchar(3),
   primary key (dept, courseNo),
   CONSTRAINT courseFkey FOREIGN KEY (prereq_dept, prereq_courseNo) REFERENCES CourseList(dept, courseNo)
 );
@@ -37,11 +37,11 @@ Create table CourseRequests (
 );
 
 CREATE TABLE passedCourses(
-  studentID VARCHAR(7),
-  dept varchar(4),
-  courseNo varchar(3),
-  quarter varchar(6),
-  year varchar(6),
+  studentID varchar(9),
+  dept      varchar(4),
+  courseNo  varchar(3),
+  quarter   varchar(6),
+  year      int,
   CHECK (quarter in ('Fall', 'Winter', 'Spring')),
   CONSTRAINT passedCourses_fkey1 FOREIGN KEY (studentID) REFERENCES StudentList(studentID),
   CONSTRAINT passedCourses_fkey2 FOREIGN KEY (dept, courseNo) REFERENCES CourseList(dept, courseNo)
@@ -55,8 +55,6 @@ Create Table majorReqs(
 
 CREATE OR REPLACE TRIGGER prereqTTrigger
   FOR INSERT OR UPDATE ON CourseRequests
-    -- FOR EACH ROW
--- DECLARE
 COMPOUND TRIGGER
 
   l_ID StudentList.studentID%type;
@@ -64,7 +62,10 @@ COMPOUND TRIGGER
   l_prereq_courseNo CourseList.prereq_courseNo%type;
   l_dept CourseList.dept%type;
   l_courseNo CourseList.courseNo%type;
-  l_count NUMBER(1,0);
+  l_year  CourseRequests.year%type;
+  l_quarter  CourseRequests.quarter%type;
+  l_passed_count NUMBER(1,0);
+  l_planned_count NUMBER(1,0);
   l_taken NUMBER(1,0);
 
 BEFORE EACH ROW IS
@@ -77,6 +78,8 @@ BEGIN
   l_ID       := :new.studentID;
   l_dept     := :new.dept;
   l_courseNo := :new.courseNo;
+  l_year     := :new.year;
+  l_quarter  := :new.quarter;
 END BEFORE EACH ROW;
 
 AFTER STATEMENT IS
@@ -88,18 +91,38 @@ BEGIN
           dept      = l_dept AND
           courseNo  = l_courseNo;
 
+  -- spring needs to come last for comparisons, so that it works out to be fall < winter < spring
+  if l_quarter = 'Spring' THEN
+    l_quarter := 'ZSpr';
+  END IF;
+
   -- if a prereq exists and they haven't taken the requested course yet
   if l_prereq_dept <> 'N/A' AND l_taken = 0 THEN
+    -- see if student has already taken the prereq
     SELECT  count(*)
-      INTO  l_count
+      INTO  l_passed_count
       FROM  passedCourses
       WHERE studentID = l_ID AND
-            dept      = l_prereq_dept  AND
+            dept      = l_prereq_dept AND
             courseNo  = l_prereq_courseNo;
+    -- see if student PLANS to take the prereq prior to the requested course
+    SELECT  count(*)
+      INTO  l_planned_count
+      FROM  courseRequests
+      WHERE studentID  = l_ID AND
+            dept       = l_prereq_dept AND
+            courseNo   = l_prereq_courseNo AND (
+              year      < l_year OR (
+                year    = l_year AND
+                quarter < l_quarter
+              )
+            );
 
-    if l_count = 0 THEN
-      RAISE_APPLICATION_ERROR (-20000, 'Cannot add course without prereq');
+    if (l_passed_count = 0 AND l_planned_count = 0) THEN
+      RAISE_APPLICATION_ERROR (-20000, 'Cannot take course before prereq');
     END IF;
+  ELSIF l_taken <> 0 THEN
+    RAISE_APPLICATION_ERROR (-20001, 'Cannot add course previously completed');
   END IF;
 
 END AFTER STATEMENT;
@@ -254,15 +277,48 @@ Insert into majorReqs values ('COEN', '194');
 Insert into majorReqs values ('COEN', '195');
 Insert into majorReqs values ('COEN', '196');
 
-SELECT   distinct mr.dept, mr.courseNo
-  FROM     majorReqs mr
-  WHERE    (mr.dept, mr.courseNo) not in (
-    Select dept, courseNo
-    from   passedCourses
-    where  studentID = '4'
-  ) and    (mr.dept, mr.courseNo) not in (
-    Select dept, courseNo
-    from   courseRequests
-    where  studentID = '4'
-  )
-  ORDER BY mr.dept, mr.courseNo;
+-- SELECT   distinct mr.dept, mr.courseNo
+--   FROM     majorReqs mr
+--   WHERE    (mr.dept, mr.courseNo) not in (
+--     Select dept, courseNo
+--     from   passedCourses
+--     where  studentID = '4'
+--   ) and    (mr.dept, mr.courseNo) not in (
+--     Select dept, courseNo
+--     from   courseRequests
+--     where  studentID = '4'
+--   )
+--   ORDER BY mr.dept, mr.courseNo;
+
+-- Insert into CourseRequests values ('6', 'COEN', '177', 'Spring', 2020);
+--
+-- SELECT  count(*)
+--   FROM  courseRequests
+--   WHERE studentID = '6' AND
+--         dept      = 'ENGR'  AND
+--         courseNo  = '1';
+--
+-- Insert into CourseRequests values ('4', 'ENGR', '1', 'Spring', 2020);
+
+
+-- Select * from courseRequests where studentID = '17';
+Insert into courseRequests values ('17', 'ENGR', '1', 'Fall', 2020);
+-- Insert into courseRequests values ('17', 'COEN', '177', 'Fall', 2020);
+-- Delete from courseRequests where studentID = '17' AND courseNo = '177';
+-- Insert into courseRequests values ('17', 'COEN', '177', 'Fall', 2019);
+-- Insert into courseRequests values ('17', 'COEN', '177', 'Winter', 2020);
+--
+-- Select * from courseRequests where studentID = '18';
+Insert into courseRequests values ('18', 'ENGR', '1', 'Winter', 2020);
+-- Insert into courseRequests values ('18', 'COEN', '177', 'Spring', 2020);
+-- Delete from courseRequests where studentID = '18' AND courseNo = '177';
+-- Insert into courseRequests values ('18', 'COEN', '177', 'Fall', 2019);
+-- Insert into courseRequests values ('18', 'COEN', '177', 'Winter', 2020);
+
+-- SELECT *
+-- FROM   CourseRequests
+-- WHERE  studentID = '17' and
+--        dept      = 'ENGR' and
+--        courseNo  = '1' and not
+--        (year     = 2018 and
+--        quarter   = 'Fall');

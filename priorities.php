@@ -20,13 +20,14 @@
 		</ul>
 	</nav>
 	<div class="below-nav"></div>
-  <h1>Full list of class priorities</h1>
+	<main>
+  	<h1>Full list of class priorities</h1>
 <?php
 
 classPriorities();
 
 function classPriorities() {
-	$conn=oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
+	$conn=oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
 	if(!$conn) {
 		print "<br> connection failed:";
 		exit;
@@ -60,5 +61,6 @@ function classPriorities() {
 }
 
 ?>
+	</main>
 </body>
 </html>

@@ -21,11 +21,12 @@
 	</nav>
 	<div class="below-nav"></div>
 
-  <form method="post" action="requests.php">
-    <label for="id">Student ID</label>
-    <input type="text" name="id" id="id" value="">
-    <input type="submit" value="Submit">
-  </form>
+	<main>
+	  <form method="post" action="requests.php">
+	    <label for="id">Student ID</label>
+	    <input type="text" name="id" id="id" value="">
+	    <input type="submit" value="Submit">
+	  </form>
 
 <?php
 
@@ -39,7 +40,7 @@ if (isset($_GET['id'])) {
 }
 
 function requests($id) {
-	$conn=oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
+	$conn=oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
 	if(!$conn) {
 		print "<br> connection failed:";
 		exit;
@@ -106,5 +107,6 @@ function requests($id) {
 
 ?>
 <!-- end PHP script -->
+	</main>
 </body>
 </html>

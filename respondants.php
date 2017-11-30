@@ -20,13 +20,14 @@
 		</ul>
 	</nav>
 	<div class="below-nav"></div>
+	<main>
 
 <?php
 
 respondants();
 
 function respondants() {
-	$conn=oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
+	$conn=oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
 	if(!$conn) {
 		print "<br> connection failed:";
 		exit;
@@ -39,7 +40,7 @@ function respondants() {
 							count(*) as Requests
 		 FROM     CourseRequests natural join StudentList
 		 GROUP BY studentID, (lastName || ', ' || firstName)
-		 ORDER BY studentID"
+		 ORDER BY cast (studentID as int)"
 	);
 	$nonresp = oci_parse(
 		$conn,
@@ -50,7 +51,7 @@ function respondants() {
 		   SELECT distinct studentID
 		   FROM   CourseRequests
 		 )
-		 ORDER BY studentID"
+		 ORDER BY cast (studentID as int)"
 	);
 
 	echo '<h1 id="resp">Respondant students</h1>';
@@ -85,5 +86,6 @@ function respondants() {
 
 ?>
 <!-- end PHP script -->
+	</main>
 </body>
 </html>

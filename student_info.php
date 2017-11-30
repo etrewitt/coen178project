@@ -20,13 +20,13 @@
 		</ul>
 	</nav>
 	<div class="below-nav"></div>
-
-	<form method="post" action="student_info.php">
-    <label for="id">Student ID</label>
-    <input type="text" name="id" id="id" value="">
-    <input type="submit" value="Submit">
-  </form>
-  <br>
+	<main>
+		<form method="post" action="student_info.php">
+	    <label for="id">Student ID</label>
+	    <input type="text" name="id" id="id" value="">
+	    <input type="submit" value="Submit">
+	  </form>
+	  <br>
 
 <?php
 
@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 function info($id) {
-	$conn=oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
+	$conn=oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
 	if(!$conn) {
 		print "<br> connection failed:";
 		exit;
@@ -88,7 +88,7 @@ function info($id) {
 }
 
 function coursesNeeded($id) {
-	$conn=oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
+	$conn=oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
 	if(!$conn) {
 		print "<br> connection failed:";
 		exit;
@@ -107,7 +107,7 @@ function coursesNeeded($id) {
 								from   courseRequests
 								where  studentID = '4'
 							)
-		 ORDER BY mr.dept, mr.courseNo"
+		 ORDER BY mr.dept, cast (mr.courseNo as int)"
 	);
 
 	oci_execute($needed);
@@ -128,5 +128,6 @@ function coursesNeeded($id) {
 
 ?>
 <!-- end PHP script -->
+	</main>
 </body>
 </html>

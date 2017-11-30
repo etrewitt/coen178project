@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 function validateInput($id, $dept, $courseNo, $year, $quarter) {
-	$conn = oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
+	$conn = oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
 	if (!$conn) {
 		print "<br> connection failed:";
 		exit;
@@ -80,6 +80,7 @@ function validateInput($id, $dept, $courseNo, $year, $quarter) {
 			echo "\t</tr>";
 		}
 		echo "\n</table>\n";
+		echo '<br><a href="enter_course.html" class="button" style="font-size: 10pt;">Add a different course</a><br>';
 		OCILogoff($conn);
 		return false;
 	}
@@ -99,7 +100,8 @@ function validateInput($id, $dept, $courseNo, $year, $quarter) {
 		$i++;
 	}
 	if ($i != 0) {
-		print "<br> $id is already registered for $dept $courseNo";
+		print "<p>$id is already registered for $dept $courseNo</p>";
+		echo '<a href="enter_course.html" class="button" style="font-size: 10pt;">Add a different course</a><br>';
 		OCILogoff($conn);
 		return false;
 	}
@@ -110,7 +112,7 @@ function validateInput($id, $dept, $courseNo, $year, $quarter) {
 
 function addCourse($id, $dept, $courseNo, $year, $quarter) {
 	// connect to your database. Type in your username, password and the DB path
-	$conn = oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
+	$conn = oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
 	if (!$conn) {
 		print "<br> connection failed:";
 		exit;
@@ -121,10 +123,20 @@ function addCourse($id, $dept, $courseNo, $year, $quarter) {
 		$conn,
 		"INSERT INTO CourseRequests values ('$id', '$dept', '$courseNo', '$quarter', $year)"
 	);
-	oci_execute($query);
-
-	$nextYear = $year + 1;
-	print "requested $dept $courseNo for $id in the $quarter $year-$nextYear quarter";
+	if (! @oci_execute($query)) {
+		$err = oci_error($query);
+		$code = $err["code"];
+		if ($code == 20000) {
+			echo "<p><b>Error $code:</b> Failed to meet the prerequisite(s) for $dept $courseNo.</p>\n";
+			echo '<a href="enter_course.html" class="button" style="font-size: 10pt;">Add a different course</a><br>';
+		} elseif ($code == 20001) {
+			echo "<p><b>Error $code:</b> Already completed $dept $courseNo.</p>\n";
+			echo '<a href="enter_course.html" class="button" style="font-size: 10pt;">Add a different course</a><br>';
+		}
+	} else {
+		$nextYear = $year + 1;
+		print "<p>Successfully requested $dept $courseNo for $id in the $quarter $year-$nextYear quarter.</p>";
+	}
 
 	OCILogoff($conn);
 }

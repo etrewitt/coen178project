@@ -20,6 +20,7 @@
       </ul>
     </nav>
 		<div class="below-nav"></div>
+		<main>
 
 <?php
 
@@ -38,7 +39,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$quarter = $_POST['quarter'];
 
 	// validate selection
-	$valid = courseExists($dept, $courseNo) & isRequesting($id, $old_dept, $old_courseNo, $old_year, $old_quarter) & notRequesting($id, $dept, $courseNo);
+	$valid = courseExists($dept, $courseNo)
+				 & isRequesting($id, $old_dept, $old_courseNo, $old_year, $old_quarter)
+				 & notRequesting($id, $dept, $courseNo, $year, $quarter);
 
 	if ($valid) {
 		// add course
@@ -47,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 function courseExists($dept, $courseNo) {
-	$conn = oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
+	$conn = oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
 	if (!$conn) {
 		print "<br> connection failed:";
 		exit;
@@ -66,7 +69,7 @@ function courseExists($dept, $courseNo) {
 		$i++;
 	}
 	if ($i == 0) {
-		print "<br><b>$dept $courseNo</b> doesn't exist; valid courses in $dept are:";
+		print "<p><b>$dept $courseNo</b> doesn't exist; valid courses in $dept are:</p>";
 		$query = oci_parse(
 			$conn,
 			"SELECT (dept || ' ' || courseNo) as course, name, units
@@ -95,7 +98,7 @@ function courseExists($dept, $courseNo) {
 }
 
 function isRequesting($id, $dept, $courseNo, $year, $quarter) {
-  $conn = oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
+  $conn = oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
   if (!$conn) {
     print "<br> connection failed:";
     exit;
@@ -106,10 +109,10 @@ function isRequesting($id, $dept, $courseNo, $year, $quarter) {
 		$conn,
 		"SELECT *
 		 FROM   CourseRequests
-		 WHERE  studentID = '$id' and
-		        dept      = '$dept' and
+		 WHERE  studentID = '$id'       and
+		        dept      = '$dept'     and
 						courseNo  = '$courseNo' and
-            year      = '$year' and
+            year      = '$year'     and
             quarter   = '$quarter'"
 	);
 	oci_execute($query);
@@ -118,7 +121,7 @@ function isRequesting($id, $dept, $courseNo, $year, $quarter) {
 		$i++;
 	}
 	if ($i == 0) {
-		print "<br> $id isn't currently requesting $dept $courseNo";
+		print "<p>$id isn't currently requesting $dept $courseNo</p>";
 		OCILogoff($conn);
 		return false;
 	}
@@ -127,21 +130,24 @@ function isRequesting($id, $dept, $courseNo, $year, $quarter) {
   return true;
 }
 
-function notRequesting($id, $dept, $courseNo) {
-  $conn = oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
+function notRequesting($id, $dept, $courseNo, $year, $quarter) {
+  $conn = oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
   if (!$conn) {
     print "<br> connection failed:";
     exit;
   }
 
-  // make sure the student is already requesting this course
+  // make sure the student is not already requesting this course (except if it's the same year/quarter that's already being moved)
 	$query = oci_parse(
 		$conn,
 		"SELECT *
 		 FROM   CourseRequests
-		 WHERE  studentID = '$id' and
-		        dept      = '$dept' and
-						courseNo  = '$courseNo'"
+		 WHERE  studentID = '$id'       and
+		        dept      = '$dept'     and
+						courseNo  = '$courseNo' and not (
+		 					year    = '$year'     and
+							quarter = '$quarter'
+						)"
 	);
 	oci_execute($query);
 	$i = 0;
@@ -149,7 +155,7 @@ function notRequesting($id, $dept, $courseNo) {
 		$i++;
 	}
 	if ($i != 0) {
-		print "<br> $id isn't currently requesting $dept $courseNo";
+		print "<p> $id is already requesting $dept $courseNo </p>";
 		OCILogoff($conn);
 		return false;
 	}
@@ -159,7 +165,7 @@ function notRequesting($id, $dept, $courseNo) {
 }
 
 function changeCourse($id, $old_dept, $old_courseNo, $old_year, $old_quarter, $dept, $courseNo, $year, $quarter) {
-	$conn = oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
+	$conn = oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
 	if (!$conn) {
 		print "<br> connection failed:";
 		exit;
@@ -178,36 +184,23 @@ function changeCourse($id, $old_dept, $old_courseNo, $old_year, $old_quarter, $d
             year = $old_year           and
             quarter = '$old_quarter'"
 	);
-	oci_execute($query);
-
-	$nextYear = $year + 1;
-	print "requested $dept $courseNo for $id in the $quarter $year-$nextYear quarter";
-
-	OCILogoff($conn);
-}
-
-function addCourse($id, $dept, $courseNo, $year, $quarter) {
-	// connect to your database. Type in your username, password and the DB path
-	$conn = oci_connect( 'etrewitt', '/* password */', '//dbserver.engr.scu.edu/db11g' );
-	if (!$conn) {
-		print "<br> connection failed:";
-		exit;
+	if (! @oci_execute($query)) {
+		$err = oci_error($query);
+		$code = $err["code"];
+		if ($code == 20000) {
+			echo "<p><b>Error $code:</b> Failed to meet the prerequisite(s) for $dept $courseNo.</p>\n";
+		} elseif ($code == 20001) {
+			echo "<p><b>Error $code:</b> Already completed $dept $courseNo.</p>\n";
+		}
+	} else {
+		$nextYear = $year + 1;
+		print "<p>Successfully requested $dept $courseNo for $id in the $quarter $year-$nextYear quarter.</p>";
 	}
-
-	// TODO: replace with SQL procedure?
-	$query = oci_parse(
-		$conn,
-		"INSERT INTO CourseRequests values ('$id', '$dept', '$courseNo', '$quarter', $year)"
-	);
-	oci_execute($query);
-
-	$nextYear = $year + 1;
-	print "requested $dept $courseNo for $id in the $quarter $year-$nextYear quarter";
 
 	OCILogoff($conn);
 }
 
 ?>
-
+		</main>
 	</body>
 </html>

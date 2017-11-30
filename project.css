@@ -1,0 +1,118 @@
+nav {
+  margin:     10px 0px 20px 0px;
+  padding:    0 20% 0 5%;
+  background: #3c3c3c;
+}
+
+nav ul {
+  margin:  0;
+  padding: 0;
+}
+nav li {
+  position: relative;
+  list-style: none;
+  display: inline-block;
+
+  width:  16%;
+  margin: 3px 0px 3px 0px;
+  text-align:  center;
+  font-weight: bold;
+
+  /*background: #d0d0d0;*/
+  line-height: 200%;
+}
+nav li a {
+  display: block;
+  font-size: 10pt;
+
+  border-left: 1px dotted #bbb;
+  border-radius: 5px;
+  color: #fff;
+  text-decoration: none;
+}
+nav li a.home {
+  border-left: 0px;
+}
+nav li a:hover {
+  background: #a70000 ;
+  color: #d7a0a0;
+}
+nav a.current {
+  background-color: #808080;
+  color: #d70000;
+}
+nav a.current:hover {
+  background-color: #808080 !important;
+}
+
+table {
+  border-collapse: collapse;
+  border: 1px solid #555;
+}
+
+table td {
+  padding: 3px 6px 3px 6px;
+  border: 1px solid #555;
+}
+
+table th {
+  padding: 6px;
+  background: #3c3c3c;
+  color: #fff;
+}
+
+/*nav li ul {
+  position: absolute;
+  display: block;
+  padding-right: 0%;
+  padding-left: 0%;
+  width: 100%;
+  left: -9999px;
+  z-index: 99;
+}
+nav li ul a {
+}
+nav li:hover ul {
+  color: #ff7070;
+  left: 0;
+}
+nav li ul li {
+  display: block;
+  width: 100%;
+  text-align: left;
+
+  background: rgba(192, 182, 248, 0.6) !important;
+}*/
+nav li ul li a {
+  padding-left: 5%;
+}
+
+a.button {
+  color: #fff;
+  background-color: #808080;
+  border-radius: 5px;
+  padding: 4px;
+  margin: 2px;
+  text-decoration: none;
+  font-family: arial;
+  font-size: 6pt;
+  font-variant: small-caps;
+  vertical-align: middle;
+}
+
+legend {
+  font-weight: bold;
+}
+fieldset {
+  margin-bottom: 10px;
+}
+
+label {
+  margin: 2px 5px 2px 2px;
+}
+input {
+  margin: 2px 10px 2px 2px;
+}
+select {
+  margin: 2px 10px 2px 2px;
+}

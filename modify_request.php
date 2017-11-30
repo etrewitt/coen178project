@@ -7,6 +7,9 @@
 </head>
 <body>
 	<nav>
+		<header>
+			<h1>Course Availability Planning Survey</h1>
+		</header>
 		<ul>
 			<li><a id="home" class="home" href="http://students.engr.scu.edu/~etrewitt/coen178project/">Home</a></li
 			><li><a id="request" class="current" href="enter_course.html">Request Course</a></li
@@ -16,6 +19,7 @@
 			><li><a id="student_info" href="student_info.php">Student Info</a></li>
 		</ul>
 	</nav>
+	<div class="below-nav"></div>
   <form method="post" action="change_course.php">
     <fieldset>
       <legend>Old course</legend>

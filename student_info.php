@@ -6,6 +6,9 @@
 	<link rel="stylesheet" type="text/css" href="project.css">
 </head>
 <body>
+	<header>
+		<h1>Course Availability Planning Survey</h1>
+	</header>
 	<nav>
 		<ul>
 			<li><a id="home" class="home" href="http://students.engr.scu.edu/~etrewitt/coen178project/">Home</a></li
@@ -16,6 +19,7 @@
 			><li><a id="student_info" class="current" href="student_info.php">Student Info</a></li>
 		</ul>
 	</nav>
+	<div class="below-nav"></div>
 
 	<form method="post" action="student_info.php">
     <label for="id">Student ID</label>

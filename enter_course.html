@@ -6,6 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="project.css">
 	</head>
 	<body>
+		<header>
+			<h1>Course Availability Planning Survey</h1>
+		</header>
 		<nav>
       <ul>
         <li><a id="home" class="home" href="http://students.engr.scu.edu/~etrewitt/coen178project/">Home</a></li
@@ -16,41 +19,43 @@
         ><li><a id="student_info" href="student_info.php">Student Info</a></li>
       </ul>
     </nav>
-		<form method="post" action="add_course.php">
-			<fieldset>
-				<legend>Course input</legend>
-				<label for="id">Student ID</label>
-				<input type="text" name="id" value="", id="id"></input>
-				<br>
-				<label for="dept">Department</label>
-				<select name="dept" id="dept">
-					<option value="">Select a department</option>
-					<option value="COEN">COEN</option>
-					<option value="ENGR">ENGR</option>
-					<option value="ELEN">ELEN</option>
-					<!-- etc -->
-				</select>
-				<br>
-				<label for="courseNo">Course No.</label>
-				<input type="text" name="courseNo" value="", id="courseNo">
-				<br>
-				<label for="year">Year</label>
-				<select name="year" id="year">
-					<option value="2018">2018-2019</option>
-					<option value="2019">2019-2020</option>
-					<option value="2020">2020-2021</option>
-					<option value="2021">2021-2022</option>
-				</select>
-				<label for="quarter">Quarter</label>
-				<select name="quarter" id="quarter">
-					<option value="Fall">Fall</option>
-					<option value="Winter">Winter</option>
-					<option value="Spring">Spring</option>
-				</select>
-			</fieldset>
+		<div class="below-nav"></div>
+		<main>
+			<form method="post" action="add_course.php">
+				<fieldset>
+					<legend>Course input</legend>
+					<label for="id">Student ID</label>
+					<input type="text" name="id" value="", id="id"></input>
+					<br>
+					<label for="dept">Department</label>
+					<select name="dept" id="dept">
+						<option value="">Select a department</option>
+						<option value="COEN">COEN</option>
+						<option value="ENGR">ENGR</option>
+						<option value="ELEN">ELEN</option>
+					</select>
+					<br>
+					<label for="courseNo">Course No.</label>
+					<input type="text" name="courseNo" value="", id="courseNo">
+					<br>
+					<label for="year">Year</label>
+					<select name="year" id="year">
+						<option value="2018">2018-2019</option>
+						<option value="2019">2019-2020</option>
+						<option value="2020">2020-2021</option>
+						<option value="2021">2021-2022</option>
+					</select>
+					<label for="quarter">Quarter</label>
+					<select name="quarter" id="quarter">
+						<option value="Fall">Fall</option>
+						<option value="Winter">Winter</option>
+						<option value="Spring">Spring</option>
+					</select>
+				</fieldset>
 
-			<input type="submit" value="Submit">
-			<input type="reset" value="Reset">
-		</form>
+				<input type="submit" value="Submit">
+				<input type="reset" value="Reset">
+			</form>
+		</main>
 	</body>
 </html>

@@ -26,6 +26,7 @@
 
 respondants();
 
+// Generate tables for respondants and non-respondants
 function respondants() {
 	$conn=oci_connect( 'etrewitt', '/* password here */', '//dbserver.engr.scu.edu/db11g' );
 	if(!$conn) {

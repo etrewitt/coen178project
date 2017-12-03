@@ -53,6 +53,9 @@ Create Table majorReqs(
   CONSTRAINT majorReqs_fkey1 FOREIGN KEY (dept, courseNo) REFERENCES CourseList(dept, courseNo)
 );
 
+-- Ensure that a student does not request a course that they've already passed,
+-- or will not have cleared the prereqs for before the quarter they request it
+-- for.
 CREATE OR REPLACE TRIGGER prereqTTrigger
   FOR INSERT OR UPDATE ON CourseRequests
 COMPOUND TRIGGER
@@ -220,25 +223,8 @@ Insert into majorReqs values ('COEN', '195');
 Insert into majorReqs values ('COEN', '196');
 
 Insert into passedCourses values ('0', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('1', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('2', 'ENGR', '1', 'Fall', 2018);
 Insert into passedCourses values ('3', 'ENGR', '1', 'Fall', 2018);
 Insert into passedCourses values ('4', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('5', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('6', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('7', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('8', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('9', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('10', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('11', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('12', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('13', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('14', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('15', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('16', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('17', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('18', 'ENGR', '1', 'Fall', 2018);
--- Insert into passedCourses values ('19', 'ENGR', '1', 'Fall', 2018);
 
 Insert into CourseRequests values ('0', 'COEN', '122', 'Fall', 2019);
 Insert into CourseRequests values ('1', 'COEN', '122', 'Fall', 2019);
@@ -277,48 +263,5 @@ Insert into majorReqs values ('COEN', '194');
 Insert into majorReqs values ('COEN', '195');
 Insert into majorReqs values ('COEN', '196');
 
--- SELECT   distinct mr.dept, mr.courseNo
---   FROM     majorReqs mr
---   WHERE    (mr.dept, mr.courseNo) not in (
---     Select dept, courseNo
---     from   passedCourses
---     where  studentID = '4'
---   ) and    (mr.dept, mr.courseNo) not in (
---     Select dept, courseNo
---     from   courseRequests
---     where  studentID = '4'
---   )
---   ORDER BY mr.dept, mr.courseNo;
-
--- Insert into CourseRequests values ('6', 'COEN', '177', 'Spring', 2020);
---
--- SELECT  count(*)
---   FROM  courseRequests
---   WHERE studentID = '6' AND
---         dept      = 'ENGR'  AND
---         courseNo  = '1';
---
--- Insert into CourseRequests values ('4', 'ENGR', '1', 'Spring', 2020);
-
-
--- Select * from courseRequests where studentID = '17';
 Insert into courseRequests values ('17', 'ENGR', '1', 'Fall', 2020);
--- Insert into courseRequests values ('17', 'COEN', '177', 'Fall', 2020);
--- Delete from courseRequests where studentID = '17' AND courseNo = '177';
--- Insert into courseRequests values ('17', 'COEN', '177', 'Fall', 2019);
--- Insert into courseRequests values ('17', 'COEN', '177', 'Winter', 2020);
---
--- Select * from courseRequests where studentID = '18';
 Insert into courseRequests values ('18', 'ENGR', '1', 'Winter', 2020);
--- Insert into courseRequests values ('18', 'COEN', '177', 'Spring', 2020);
--- Delete from courseRequests where studentID = '18' AND courseNo = '177';
--- Insert into courseRequests values ('18', 'COEN', '177', 'Fall', 2019);
--- Insert into courseRequests values ('18', 'COEN', '177', 'Winter', 2020);
-
--- SELECT *
--- FROM   CourseRequests
--- WHERE  studentID = '17' and
---        dept      = 'ENGR' and
---        courseNo  = '1' and not
---        (year     = 2018 and
---        quarter   = 'Fall');

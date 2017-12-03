@@ -118,7 +118,6 @@ function addCourse($id, $dept, $courseNo, $year, $quarter) {
 		exit;
 	}
 
-	// TODO: replace with SQL procedure?
 	$query = oci_parse(
 		$conn,
 		"INSERT INTO CourseRequests values ('$id', '$dept', '$courseNo', '$quarter', $year)"

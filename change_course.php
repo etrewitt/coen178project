@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	// validate selection
 	$valid = courseExists($dept, $courseNo)
 				 & isRequesting($id, $old_dept, $old_courseNo, $old_year, $old_quarter)
-				 & notRequesting($id, $dept, $courseNo, $year, $quarter);
+				 & notRequesting($id, $dept, $courseNo, $old_year, $old_quarter);
 
 	if ($valid) {
 		// add course
